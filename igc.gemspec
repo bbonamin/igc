@@ -4,8 +4,8 @@ require File.expand_path('../lib/igc/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["bbonamin"]
   gem.email         = ["bruno@bonamin.org"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = 'Parses IGC files and exposes them as ruby objects'
+  gem.summary       = 'Parses avionics IGC files from loggers and apps such as XCSoar and exposes them in a fancy object oriented way.'
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)

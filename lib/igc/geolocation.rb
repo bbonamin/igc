@@ -1,12 +1,16 @@
 module IGC
   module Geolocation
-    # Convert geocoordinates from mindec notation of IGC to dec notation
+    # Public: Converts geocoordinates from mindec notation of IGC to dec notation
     #
-    # @param [String] long The longitude from the igc file
-    # @param [String] lat  The Latitude from the igc file
-    # @return [Float, Float] Longitude and Latitude in decimal notation
-    # @example Convert a pair of coordinates
-    #   GeoLocation.to_dec("01343272E", "4722676N")  #=>[13.7212,47.37793333333333]
+    # long: The longitude from the igc file
+    # lat:  The Latitude from the igc file
+    # 
+    # Example 
+    #
+    #   GeoLocation.to_dec("01343272E", "4722676N")  
+    #   #=>[13.7212,47.37793333333333]
+    #
+    # Returns Longitude and Latitude in decimal notation
     def self.to_dec(long, lat)
 
       long_m = long.match(/^(\d{3})((\d{2})(\d{3}))(E|W)/)

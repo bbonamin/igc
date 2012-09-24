@@ -1,8 +1,10 @@
 module IGC
 	class	Reader
 		attr_reader :contents
+		attr_reader :a_record
 
   	REGEX_H_DTE = /^hf(dte)((\d{2})(\d{2})(\d{2}))/i
+  	REGEX_A = /^[a]([a-z\d]{3})([a-z\d]{3})?(.*)$/i
 		REGEX_H = /^[h][f|o|p]([\w]{3})(.*):(.*)$/i
 		REGEX_B = /^(B)(\d{2})(\d{2})(\d{2})(\d{7}[NS])(\d{8}[EW])([AV])(\d{5})(\d{5})/
 
@@ -13,6 +15,10 @@ module IGC
 			f = File.open(file_path) do |file|
 				@contents = file.read
 			end
+
+			unless @a_record = @contents.match(REGEX_A)
+        raise "Invalid file format"
+      end
 		end
 
 		# Public : Scans the contents to get the date of the IGC file.
@@ -25,6 +31,10 @@ module IGC
 			date = Date.strptime(date_array[1],'%d%m%y')
 		end
 
+		# Public : Returns the A record of the file
+		def device_id
+			
+		end
 		# Public : Scans the contents to get all the IGC header information (Section H)
 		#
 		# Returns a hash with all the header keys as indexes and their values.
@@ -42,10 +52,24 @@ module IGC
 		# Returns a hash with the time as the key and an array with 
 		def flight_path
 			flight_path = {}
-			@contents.scan(REGEX_B).each do |b|
+			b_records = @contents.scan(REGEX_B)
+
+			gps_present = b_records.map{|b| b[8].to_i - b[7].to_i}.uniq
+
+			# NOTE: The altitude is given by both the pressure sensor and gps, 
+			# 			we should use the pressure altitude when it's present (b[8]),
+			# 			otherwise, the should use the gps alt. For now we'll just
+			# 			use the gps altitude.
+			b_records.each do |b|
+
+				# Gets the datetime from the file date + time of record
 				time = DateTime.new(date.year, date.month, date.day, 
               b[1].to_i, b[2].to_i, b[3].to_i).to_s
-				position = IGC::Geolocation.to_dec(b[5], b[4])
+
+				# Gets the position at that time by long, lat and alt.
+				position = IGC::Geolocation.to_dec(b[5], b[4]) + [b[7].to_i]
+
+				# Adds the time and position in the hash
 				flight_path[time] = position
 			end
 			flight_path

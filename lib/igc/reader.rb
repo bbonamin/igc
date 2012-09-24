@@ -4,12 +4,13 @@ module IGC
 
   	REGEX_H_DTE = /^hf(dte)((\d{2})(\d{2})(\d{2}))/i
 		REGEX_H = /^[h][f|o|p]([\w]{3})(.*):(.*)$/i
+		REGEX_B = /^(B)(\d{2})(\d{2})(\d{2})(\d{7}[NS])(\d{8}[EW])([AV])(\d{5})(\d{5})/
 
 		# Public : Initializes a new IGC::Reader instance, taking a file_path and filling the contents
 		# 
 		# file_path: string with the path to the igc file
 		def initialize(file_path)
-			f = File.open('spec/support/cpilot.igc') do |file|
+			f = File.open(file_path) do |file|
 				@contents = file.read
 			end
 		end
@@ -34,6 +35,20 @@ module IGC
 				headers_hash[h.first] = h.last.chomp
 			end
 			return headers_hash
+		end
+
+		# Public : Scans the contents to get all B records forming the path of the flight
+		#
+		# Returns a hash with the time as the key and an array with 
+		def flight_path
+			flight_path = {}
+			@contents.scan(REGEX_B).each do |b|
+				time = DateTime.new(date.year, date.month, date.day, 
+              b[1].to_i, b[2].to_i, b[3].to_i).to_s
+				position = IGC::Geolocation.to_dec(b[5], b[4])
+				flight_path[time] = position
+			end
+			flight_path
 		end
 
 		# Public : Returns the content of the pilot from the headers

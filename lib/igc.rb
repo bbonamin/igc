@@ -1,6 +1,6 @@
 require "igc/version"
 require "igc/reader"
+require "igc/geolocation"
 
-module Igc
-  # Your code goes here...
+module IGC
 end

@@ -2,6 +2,7 @@ module IGC
 	class	Reader
 		attr_reader :contents
 		attr_reader :a_record
+		attr_reader :date
 
   	REGEX_H_DTE = /^hf(dte)((\d{2})(\d{2})(\d{2}))/i
   	REGEX_A = /^[a]([a-z\d]{3})([a-z\d]{3})?(.*)$/i
@@ -19,16 +20,9 @@ module IGC
 			unless @a_record = @contents.match(REGEX_A)
         raise "Invalid file format"
       end
-		end
 
-		# Public : Scans the contents to get the date of the IGC file.
-		# 				 Gets an array with all the date information, and creates
-		# 				 a new date object from the UTC date (DDMMYY)
-		#
-		# Returns the date of the IGC file.
-		def date
-			date_array = @contents.scan(REGEX_H_DTE)[0]
-			date = Date.strptime(date_array[1],'%d%m%y')
+      date_array = @contents.scan(REGEX_H_DTE)[0]
+			@date = Date.strptime(date_array[1],'%d%m%y')
 		end
 
 		# Public : Returns the A record of the file
@@ -63,7 +57,7 @@ module IGC
 			b_records.each do |b|
 
 				# Gets the datetime from the file date + time of record
-				time = DateTime.new(date.year, date.month, date.day, 
+				time = DateTime.new(@date.year, @date.month, @date.day, 
               b[1].to_i, b[2].to_i, b[3].to_i).to_s
 
 				# Gets the position at that time by long, lat and alt.

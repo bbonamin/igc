@@ -4,10 +4,10 @@ module IGC
     #
     # long: The longitude from the igc file
     # lat:  The Latitude from the igc file
-    # 
-    # Example 
     #
-    #   GeoLocation.to_dec("01343272E", "4722676N")  
+    # Example
+    #
+    #   GeoLocation.to_dec("01343272E", "4722676N")
     #   #=>[13.7212,47.37793333333333]
     #
     # Returns Longitude and Latitude in decimal notation
